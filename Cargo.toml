@@ -1,0 +1,10 @@
+[package]
+name = "argus-upgrade"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sqlx = { version = "0.6", features = ["runtime-tokio-rustls", "sqlite", "macros"] }
+url = "2.2.2"
+urlnorm = "0.1.6"
+tokio = { version = "1", features = ["full"] }
