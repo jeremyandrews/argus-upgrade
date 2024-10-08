@@ -37,7 +37,7 @@ async fn main() -> Result<(), sqlx::Error> {
         .fetch_all(&pool)
         .await?;
 
-    for (id, url) in articles {
+    for (i, (id, url)) in articles.iter().enumerate() {
         let parsed_url = match Url::parse(&url) {
             Ok(parsed) => parsed,
             Err(e) => {
@@ -53,6 +53,10 @@ async fn main() -> Result<(), sqlx::Error> {
             .bind(id)
             .execute(&pool)
             .await?;
+
+        if i % 100 == 0 {
+            println!("Processed {} articles...", i);
+        }
     }
 
     // Update rss_queue table
@@ -60,7 +64,7 @@ async fn main() -> Result<(), sqlx::Error> {
         .fetch_all(&pool)
         .await?;
 
-    for (id, url) in queue_entries {
+    for (i, (id, url)) in queue_entries.iter().enumerate() {
         let parsed_url = match Url::parse(&url) {
             Ok(parsed) => parsed,
             Err(e) => {
@@ -76,6 +80,9 @@ async fn main() -> Result<(), sqlx::Error> {
             .bind(id)
             .execute(&pool)
             .await?;
+        if i % 100 == 0 {
+            println!("Processed {} queue entries...", i);
+        }
     }
 
     Ok(())
