@@ -50,6 +50,24 @@ async fn main() -> Result<(), sqlx::Error> {
 
         let normalized_url = normalizer.compute_normalization_string(&parsed_url);
 
+        // Check if the normalized_url already exists in the 'articles' table
+        let existing_id: Option<i64> =
+            sqlx::query_scalar("SELECT id FROM articles WHERE normalized_url = ?1 LIMIT 1")
+                .bind(&normalized_url)
+                .fetch_optional(&pool)
+                .await?;
+
+        // If normalized_url already exists and it's a different record, skip this one
+        if let Some(existing_id) = existing_id {
+            if existing_id != *id {
+                println!(
+            "Skipping record with id {}: normalized_url '{}' already exists in record with id {}",
+            id, normalized_url, existing_id
+        );
+                continue; // Skip updating this record
+            }
+        }
+
         sqlx::query("UPDATE articles SET normalized_url = ?1 WHERE id = ?2")
             .bind(&normalized_url)
             .bind(id)
@@ -76,6 +94,24 @@ async fn main() -> Result<(), sqlx::Error> {
         };
 
         let normalized_url = normalizer.compute_normalization_string(&parsed_url);
+
+        // Check if the normalized_url already exists in the 'rss_queue' table
+        let existing_id: Option<i64> =
+            sqlx::query_scalar("SELECT id FROM rss_queue WHERE normalized_url = ?1 LIMIT 1")
+                .bind(&normalized_url)
+                .fetch_optional(&pool)
+                .await?;
+
+        // If normalized_url already exists and it's a different record, skip this one
+        if let Some(existing_id) = existing_id {
+            if existing_id != *id {
+                println!(
+            "Skipping record with id {}: normalized_url '{}' already exists in record with id {}",
+            id, normalized_url, existing_id
+        );
+                continue; // Skip updating this record
+            }
+        }
 
         sqlx::query("UPDATE rss_queue SET normalized_url = ?1 WHERE id = ?2")
             .bind(&normalized_url)
