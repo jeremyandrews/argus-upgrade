@@ -56,7 +56,7 @@ async fn main() -> Result<(), sqlx::Error> {
             .execute(&pool)
             .await?;
 
-        if i % 100 == 0 {
+        if i % 500 == 0 {
             println!("Processed {} articles...", i);
         }
     }
@@ -82,7 +82,7 @@ async fn main() -> Result<(), sqlx::Error> {
             .bind(id)
             .execute(&pool)
             .await?;
-        if i % 100 == 0 {
+        if i % 500 == 0 {
             println!("Processed {} queue entries...", i);
         }
     }
