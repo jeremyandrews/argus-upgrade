@@ -21,11 +21,13 @@ async fn main() -> Result<(), sqlx::Error> {
         .await?;
 
     // Create a unique index on 'articles.normalized_url'
+    println!("Creating unique index on articles...");
     sqlx::query("CREATE UNIQUE INDEX IF NOT EXISTS idx_articles_normalized_url ON articles(normalized_url);")
         .execute(&pool)
         .await?;
 
     // Create a unique index on 'rss_queue.normalized_url'
+    println!("Creating unique index on rss_queue...");
     sqlx::query("CREATE UNIQUE INDEX IF NOT EXISTS idx_rss_queue_normalized_url ON rss_queue(normalized_url);")
         .execute(&pool)
         .await?;
