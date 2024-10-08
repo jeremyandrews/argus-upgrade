@@ -10,6 +10,26 @@ async fn main() -> Result<(), sqlx::Error> {
         .connect(&database_url)
         .await?;
 
+    // Add 'normalized_url' column to the 'articles' table
+    sqlx::query("ALTER TABLE articles ADD COLUMN normalized_url TEXT;")
+        .execute(&pool)
+        .await?;
+
+    // Add 'normalized_url' column to the 'rss_queue' table
+    sqlx::query("ALTER TABLE rss_queue ADD COLUMN normalized_url TEXT;")
+        .execute(&pool)
+        .await?;
+
+    // Create a unique index on 'articles.normalized_url'
+    sqlx::query("CREATE UNIQUE INDEX IF NOT EXISTS idx_articles_normalized_url ON articles(normalized_url);")
+        .execute(&pool)
+        .await?;
+
+    // Create a unique index on 'rss_queue.normalized_url'
+    sqlx::query("CREATE UNIQUE INDEX IF NOT EXISTS idx_rss_queue_normalized_url ON rss_queue(normalized_url);")
+        .execute(&pool)
+        .await?;
+
     let normalizer = UrlNormalizer::default();
 
     // Update articles table
@@ -60,4 +80,3 @@ async fn main() -> Result<(), sqlx::Error> {
 
     Ok(())
 }
-
